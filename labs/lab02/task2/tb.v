@@ -1,52 +1,48 @@
 // tb.v
-// Starter testbench template -- YOU complete this file.
-//
-// Goal: apply all 8 combinations of I0, I1, S (5 time units apart) to DUT
-// and observe the output. Fill in every TODO below.
+// Complete testbench for lut.v
 
 module tb;
 
-  // TODO: declare the three DUT inputs as the appropriate variable type.
-  // Use exactly these names: t_i0, t_i1, t_s (needed by $monitor below).
-  reg   t_i0, t_i1, t_s;
+  parameter WIDTH = 8;
+  parameter DEPTH = 4;
 
-  // TODO: declare the DUT output as the appropriate net type.
-  // Use exactly this name: t_y (needed by $monitor below).
-  wire  t_y;
+  // TODO: declare the inputs and outputs
+  reg  [$clog2(DEPTH)-1:0] t_sel;
+  wire [WIDTH-1:0]         t_dout;
 
-  // TODO: instantiate DUT here, connecting t_i0, t_i1, t_s, t_y to its ports
-  // (Replace `mux_beh` with `mux_df` if testing the dataflow module)
-  mux_beh DUT (
-    .I0(t_i0),
-    .I1(t_i1),
-    .S (t_s),
-    .Y (t_y)
+  // TODO: instantiate DUT here
+  lut #(
+    .WIDTH(WIDTH),
+    .DEPTH(DEPTH)
+  ) DUT (
+    .sel (t_sel),
+    .dout(t_dout)
   );
 
-  // Waveform dump configuration
+  // Waveform dump configuration (DO NOT CHANGE)
   string vcd_file;
   initial begin
     if ($value$plusargs("vcd=%s", vcd_file)) begin
-      $dumpfile(vcd_file);$dumpvars(0, DUT);
+      $dumpfile(vcd_file);
+      $dumpvars(0, DUT);
     end
   end
 
+  integer i;
   initial begin
-    // TODO: apply all 8 combinations of t_i0, t_i1, t_s, 5 time units apart,
-    // then $finish. (Same pattern you used in Lab 1's tb.v.)
-    {t_i0, t_i1, t_s} = 3'b000; #5;
-    {t_i0, t_i1, t_s} = 3'b001; #5;
-    {t_i0, t_i1, t_s} = 3'b010; #5;
-    {t_i0, t_i1, t_s} = 3'b011; #5;
-    {t_i0, t_i1, t_s} = 3'b100; #5;
-    {t_i0, t_i1, t_s} = 3'b101; #5;
-    {t_i0, t_i1, t_s} = 3'b110; #5;
-    {t_i0, t_i1, t_s} = 3'b111; #5;
+    // TODO: apply different input combinations
+    for (i = 0; i < DEPTH; i = i + 1) begin
+      t_sel = i;
+      #5;
+    end
     $finish;
   end
 
   initial
-    $monitor($time, " I0=%b I1=%b S=%b | Y=%b", t_i0, t_i1, t_s, t_y);
+    $monitor($time, " sel=%0d | dout=%0d (0x%h)", t_sel, t_dout, t_dout);
+
+
+
 
 
 endmodule
